@@ -6,7 +6,7 @@ Simple class for making requests to the Invision Power Board API.  Not affiliate
 ## Usage
 
 ```php
-use cjrasmussen\InvisionPowerApi;
+use cjrasmussen\InvisionPowerApi\InvisionPowerApi;
 
 $ipb = new InvisionPowerApi($token, $url);
 
