@@ -1,12 +1,13 @@
 <?php
+
 namespace cjrasmussen\InvisionPowerApi;
 
 use RuntimeException;
 
 class InvisionPowerApi
 {
-	private $token;
-	private $api_url;
+	private string $token;
+	private string $api_url;
 
 	public function __construct($token, $community_url)
 	{
@@ -22,16 +23,13 @@ class InvisionPowerApi
 	 * @param array $args
 	 * @return mixed
 	 * @throws RuntimeException
+	 * @throws \JsonException
 	 */
-	public function request($type, $request, array $args = [])
+	public function request(string $type, string $request, array $args = [])
 	{
-		if (!is_array($args)) {
-			$args = [$args];
-		}
+		$url = $this->api_url . trim($request, ' /');
 
-		$url = $this->api_url . $request;
-
-		if ((count($args)) AND ($type === 'GET')) {
+		if (($type === 'GET') && (count($args))) {
 			$url .= '?' . http_build_query($args);
 		}
 
@@ -44,7 +42,7 @@ class InvisionPowerApi
 		curl_setopt($c, CURLOPT_USERPWD, $this->token);
 		curl_setopt($c, CURLOPT_URL, $url);
 
-		if ((count($args)) AND ($type !== 'GET')) {
+		if (($type !== 'GET') && (count($args))) {
 			curl_setopt($c, CURLOPT_POSTFIELDS, http_build_query($args));
 		}
 
@@ -63,11 +61,6 @@ class InvisionPowerApi
 		curl_close($c);
 
 		// DECODE THE RESPONSE INTO A GENERIC OBJECT
-		$data = json_decode($response);
-		if (json_last_error() !== JSON_ERROR_NONE) {
-			throw new RuntimeException('API response was not valid JSON: ' . $response);
-		}
-
-		return $data;
+		return json_decode($response, false, 512, JSON_THROW_ON_ERROR);
 	}
 }
