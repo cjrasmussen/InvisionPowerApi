@@ -42,10 +42,6 @@ class InvisionPowerApi
 		curl_setopt($c, CURLOPT_USERPWD, $this->token);
 		curl_setopt($c, CURLOPT_URL, $url);
 
-		if (($type !== 'GET') && (count($args))) {
-			curl_setopt($c, CURLOPT_POSTFIELDS, http_build_query($args));
-		}
-
 		switch ($type) {
 			case 'POST':
 				curl_setopt($c, CURLOPT_POST, 1);
@@ -55,6 +51,12 @@ class InvisionPowerApi
 				break;
 			default:
 				curl_setopt($c, CURLOPT_CUSTOMREQUEST, $type);
+		}
+
+		if (($type !== 'GET') && (count($args))) {
+			curl_setopt($c, CURLOPT_POSTFIELDS, http_build_query($args));
+		} elseif ($type === 'POST') {
+			curl_setopt($c, CURLOPT_POSTFIELDS, null);
 		}
 
 		$response = curl_exec($c);
