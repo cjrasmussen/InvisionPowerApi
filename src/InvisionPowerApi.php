@@ -32,11 +32,11 @@ class InvisionPowerApi
 	 * @param string $type
 	 * @param string $request
 	 * @param array $args
-	 * @return ?object
+	 * @return object|bool|int|null
 	 * @throws RuntimeException
 	 * @throws \JsonException
 	 */
-	public function request(string $type, string $request, array $args = []): ?object
+	public function request(string $type, string $request, array $args = [])
 	{
 		$url = $this->api_url . trim($request, ' /');
 
@@ -81,7 +81,27 @@ class InvisionPowerApi
 		$this->lastResponseHeader = substr($response, 0, $header_length);
 		$body = substr($response, $header_length);
 
-		// DECODE THE RESPONSE INTO A GENERIC OBJECT
-		return json_decode($body, false, 512, JSON_THROW_ON_ERROR);
+		if ($body[0] === '{') {
+			// JSON RESPONSE, DECODE THE RESPONSE INTO A GENERIC OBJECT
+			return json_decode($body, false, 512, JSON_THROW_ON_ERROR);
+		}
+
+		if ($body === '') {
+			// EMPTY STRING RESPONSE, RETURN NULL,
+			return null;
+		}
+
+		if ($body === 'true') {
+			// CONVERT STRING TRUE TO BOOLEAN TRUE
+			return true;
+		}
+
+		if ($body === 'false') {
+			// CONVERT STRING FALSE TO BOOLEAN FALSE
+			return false;
+		}
+
+		// ONLY THING LEFT IS NUMERIC RESPONSE
+		return (int)$body;
 	}
 }
