@@ -6,13 +6,23 @@ use RuntimeException;
 
 class InvisionPowerApi
 {
-	private string $token;
+	private ?string $token = null;
 	private string $api_url;
 
-	public function __construct($token, $community_url)
+	public function __construct($community_url)
+	{
+		$this->api_url = trim($community_url, ' /') . '/api/';
+	}
+
+	/**
+	 * Set the API token to be used in subsequent requests
+	 *
+	 * @param string $token
+	 * @return void
+	 */
+	public function setToken(string $token): void
 	{
 		$this->token = $token;
-		$this->api_url = trim($community_url, ' /') . '/api/';
 	}
 
 	/**
@@ -27,6 +37,10 @@ class InvisionPowerApi
 	 */
 	public function request(string $type, string $request, array $args = [])
 	{
+		if ($this->token === null) {
+			throw new RuntimeException('No token set. Request cannot be executed.');
+		}
+
 		$url = $this->api_url . trim($request, ' /');
 
 		if (($type === 'GET') && (count($args))) {

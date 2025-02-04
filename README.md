@@ -8,7 +8,8 @@ Simple class for making requests to the Invision Power Board API.  Not affiliate
 ```php
 use cjrasmussen\InvisionPowerApi\InvisionPowerApi;
 
-$ipb = new InvisionPowerApi($token, $url);
+$ipb = new InvisionPowerApi($url);
+$ipb->setToken($token);
 
 // GET THE MEMBER DATA FOR A SPECIFIED MEMBER
 $data = $ipb->request('GET', "/core/members/{$member_id}");
